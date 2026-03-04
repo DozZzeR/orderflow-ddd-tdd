@@ -14,6 +14,7 @@ class SubmitOrderTest extends TestCase
     {
         $orderId = OrderId::fromString('123');
         $order = Order::createDraft($orderId);
+        $order->addItem('ABC', 1);
         $order->submit();
         $this->assertSame(OrderStatus::Submitted, $order->status());
     }
@@ -22,6 +23,7 @@ class SubmitOrderTest extends TestCase
     {
         $orderId = OrderId::fromString('123');
         $order = Order::createDraft($orderId);
+        $order->addItem('ABC', 1);
         // First submit the order to set it to Submitted status
         $order->submit();
         $this->expectException(OrderCannotBeSubmitted::class);

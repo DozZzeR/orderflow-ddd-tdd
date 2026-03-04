@@ -4,12 +4,12 @@ namespace OrderFlow\Domain\Order;
 
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeSubmitted;
+use OrderFlow\Domain\Order\Exceptions\OrderItemQuantityMustBePositive;
 
 class Order
 {
-    /**
-     * Create a new class instance.
-     */
+    private $items = [];
+
     private function __construct(private OrderId $id, private OrderStatus $status)
     {
         //
@@ -35,6 +35,9 @@ class Order
         if (!$this->status->canSubmit()) {
             throw new OrderCannotBeSubmitted();
         }
+        if (empty($this->items)) {
+            throw new OrderCannotBeSubmitted();
+        }
         $this->status = OrderStatus::Submitted;
     }
 
@@ -44,5 +47,21 @@ class Order
             throw new OrderCannotBeCancelled();
         }
         $this->status = OrderStatus::Cancelled;
+    }
+
+    public function addItem($sku, $quantity): void
+    {
+        if ($quantity <= 0) {
+            throw new OrderItemQuantityMustBePositive();
+        }
+        $this->items[] = OrderItem::from($sku, $quantity);
+    }
+
+    /**
+     * @return OrderItem[]
+     */
+    public function items(): array
+    {
+        return $this->items;
     }
 }

@@ -24,6 +24,7 @@ class CancelOrderTest extends TestCase
     {
         $orderId = OrderId::fromString('123');
         $order = Order::createDraft($orderId);
+        $order->addItem('ABC', 1);
         $order->submit();
         $order->cancel();
         $this->assertSame(OrderStatus::Cancelled, $order->status());
@@ -33,6 +34,7 @@ class CancelOrderTest extends TestCase
     {
         $orderId = OrderId::fromString('123');
         $order = Order::createDraft($orderId);
+        $order->addItem('ABC', 1);
         // First submit the order to set it to Submitted status
         $order->submit();
         // First cancel the order to set it to Cancelled status
