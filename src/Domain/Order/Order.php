@@ -3,12 +3,13 @@
 namespace OrderFlow\Domain\Order;
 
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
+use OrderFlow\Domain\Order\Exceptions\OrderCannotBePaid;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeSubmitted;
 use OrderFlow\Domain\Order\Exceptions\OrderItemQuantityMustBePositive;
 
 class Order
 {
-    private $items = [];
+    private array $items = [];
 
     private function __construct(private OrderId $id, private OrderStatus $status)
     {
@@ -41,6 +42,17 @@ class Order
         $this->status = OrderStatus::Submitted;
     }
 
+    public function markPaid(): void
+    {
+        if (!$this->status->canPay()) {
+            throw new OrderCannotBePaid();
+        }
+        if ($this->status === OrderStatus::Paid) {
+            return; // idempotent no-op
+        }
+        $this->status = OrderStatus::Paid;
+    }
+
     public function cancel(): void
     {
         if (!$this->status->canCancel()) {
@@ -49,7 +61,7 @@ class Order
         $this->status = OrderStatus::Cancelled;
     }
 
-    public function addItem($sku, $quantity): void
+    public function addItem(string $sku, int $quantity): void
     {
         if ($quantity <= 0) {
             throw new OrderItemQuantityMustBePositive();

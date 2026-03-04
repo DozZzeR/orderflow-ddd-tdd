@@ -42,4 +42,15 @@ class CancelOrderTest extends TestCase
         $this->expectException(OrderCannotBeCancelled::class);
         $order->cancel();
     }
+
+    public function test_it_cannot_cancel_paid_order(): void
+    {
+        $orderId = OrderId::fromString('123');
+        $order = Order::createDraft($orderId);
+        $order->addItem('ABC', 1);
+        $order->submit();
+        $order->markPaid();
+        $this->expectException(OrderCannotBeCancelled::class);
+        $order->cancel();
+    }
 }
