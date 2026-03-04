@@ -8,9 +8,6 @@ use Tests\TestCase;
 
 class CreateOrderTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
     public function test_it_creates_orders_in_draft_status(): void
     {
         $orderId = OrderId::fromString('123');
