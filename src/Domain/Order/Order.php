@@ -5,13 +5,14 @@ namespace OrderFlow\Domain\Order;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBePaid;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeSubmitted;
+use OrderFlow\Domain\Order\Exceptions\OrderCurrencyMismatch;
 use OrderFlow\Domain\Order\Exceptions\OrderItemQuantityMustBePositive;
 
 class Order
 {
     private array $items = [];
 
-    private function __construct(private OrderId $id, private OrderStatus $status)
+    private function __construct(private OrderId $id, private OrderStatus $status, private Currency $currency)
     {
         //
     }
@@ -26,9 +27,9 @@ class Order
         return $this->status;
     }
 
-    public static function createDraft(OrderId $id): self
+    public static function createDraft(OrderId $id, Currency $currency): self
     {
-        return new self($id, OrderStatus::Draft);
+        return new self($id, OrderStatus::Draft, $currency);
     }
 
     public function submit(): void
@@ -61,12 +62,12 @@ class Order
         $this->status = OrderStatus::Cancelled;
     }
 
-    public function addItem(string $sku, int $quantity): void
+    public function addItem(string $sku, int $quantity, Money $price): void
     {
-        if ($quantity <= 0) {
-            throw new OrderItemQuantityMustBePositive();
+        if ($price->currency() !== $this->currency()) {
+            throw new OrderCurrencyMismatch();
         }
-        $this->items[] = OrderItem::from($sku, $quantity);
+        $this->items[] = OrderItem::from($sku, $quantity, $price);
     }
 
     /**
@@ -75,5 +76,19 @@ class Order
     public function items(): array
     {
         return $this->items;
+    }
+
+    public function total(): Money
+    {
+        $total = 0;
+        foreach ($this->items as $item) {
+            $total = $item->total()->amount() + $total;
+        }
+        return Money::of($total, $this->currency());
+    }
+
+    public function currency(): Currency
+    {
+        return $this->currency;
     }
 }

@@ -4,10 +4,11 @@ namespace OrderFlow\Domain\Order;
 
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeSubmitted;
+use OrderFlow\Domain\Order\Exceptions\OrderItemQuantityMustBePositive;
 
 class OrderItem
 {
-    private function __construct(private string $sku, private int $quantity)
+    private function __construct(private string $sku, private int $quantity, private Money $price)
     {
         //
     }
@@ -22,8 +23,16 @@ class OrderItem
         return $this->quantity;
     }
 
-    public static function from(string $sku, int $quantity): self
+    public static function from(string $sku, int $quantity, Money $price): self
     {
-        return new self($sku, $quantity);
+        if ($quantity <= 0) {
+            throw new OrderItemQuantityMustBePositive();
+        }
+        return new self($sku, $quantity, $price);
+    }
+
+    public function total(): Money
+    {
+        return Money::of($this->price->amount() * $this->quantity, $this->price->currency());
     }
 }

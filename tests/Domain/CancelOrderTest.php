@@ -4,7 +4,9 @@ namespace Tests\Domain;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use OrderFlow\Domain\Order\Currency;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
+use OrderFlow\Domain\Order\Money;
 use OrderFlow\Domain\Order\Order;
 use OrderFlow\Domain\Order\OrderId;
 use OrderFlow\Domain\Order\OrderStatus;
@@ -15,7 +17,7 @@ class CancelOrderTest extends TestCase
     public function test_it_cancels_draft_order(): void
     {
         $orderId = OrderId::fromString('123');
-        $order = Order::createDraft($orderId);
+        $order = Order::createDraft($orderId, Currency::USD);
         $order->cancel();
         $this->assertSame(OrderStatus::Cancelled, $order->status());
     }
@@ -23,8 +25,8 @@ class CancelOrderTest extends TestCase
     public function test_it_cancels_submitted_order(): void
     {
         $orderId = OrderId::fromString('123');
-        $order = Order::createDraft($orderId);
-        $order->addItem('ABC', 1);
+        $order = Order::createDraft($orderId, Currency::USD);
+        $order->addItem('ABC', 1, Money::of(10, Currency::USD));
         $order->submit();
         $order->cancel();
         $this->assertSame(OrderStatus::Cancelled, $order->status());
@@ -33,8 +35,8 @@ class CancelOrderTest extends TestCase
     public function test_it_cannot_cancel_cancelled_order(): void
     {
         $orderId = OrderId::fromString('123');
-        $order = Order::createDraft($orderId);
-        $order->addItem('ABC', 1);
+        $order = Order::createDraft($orderId, Currency::USD);
+        $order->addItem('ABC', 1, Money::of(10, Currency::USD));
         // First submit the order to set it to Submitted status
         $order->submit();
         // First cancel the order to set it to Cancelled status
@@ -46,8 +48,8 @@ class CancelOrderTest extends TestCase
     public function test_it_cannot_cancel_paid_order(): void
     {
         $orderId = OrderId::fromString('123');
-        $order = Order::createDraft($orderId);
-        $order->addItem('ABC', 1);
+        $order = Order::createDraft($orderId, Currency::USD);
+        $order->addItem('ABC', 1, Money::of(10, Currency::USD));
         $order->submit();
         $order->markPaid();
         $this->expectException(OrderCannotBeCancelled::class);
