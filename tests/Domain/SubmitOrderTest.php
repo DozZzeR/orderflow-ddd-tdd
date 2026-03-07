@@ -14,7 +14,7 @@ class SubmitOrderTest extends TestCase
 {
     public function test_it_submits_in_submitted_status(): void
     {
-        $orderId = OrderId::fromString('123', Currency::USD);
+        $orderId = OrderId::fromString('123');
         $order = Order::createDraft($orderId, Currency::USD);
         $order->addItem('ABC', 1, Money::of(10, Currency::USD));
         $order->submit();
@@ -23,7 +23,7 @@ class SubmitOrderTest extends TestCase
 
     public function test_it_cannot_submit_submitted_order(): void
     {
-        $orderId = OrderId::fromString('123', Currency::USD);
+        $orderId = OrderId::fromString('123');
         $order = Order::createDraft($orderId, Currency::USD);
         $order->addItem('ABC', 1, Money::of(10, Currency::USD));
         // First submit the order to set it to Submitted status

@@ -2,8 +2,6 @@
 
 namespace Tests\Domain;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use OrderFlow\Domain\Order\Currency;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
 use OrderFlow\Domain\Order\Money;

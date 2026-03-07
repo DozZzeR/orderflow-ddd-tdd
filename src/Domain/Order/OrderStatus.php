@@ -21,6 +21,6 @@ enum OrderStatus: string // Backed enum with string values
 
     public function canPay(): bool
     {
-        return $this === self::Submitted || $this === self::Paid;
+        return $this === self::Submitted;
     }
 }

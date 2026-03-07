@@ -6,11 +6,17 @@ use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBePaid;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeSubmitted;
 use OrderFlow\Domain\Order\Exceptions\OrderCurrencyMismatch;
-use OrderFlow\Domain\Order\Exceptions\OrderItemQuantityMustBePositive;
+use OrderFlow\Domain\Shared\DomainEvent;
+use OrderFlow\Domain\Order\Events\EventOrderCancelled;
+use OrderFlow\Domain\Order\Events\EventOrderSubmitted;
+use OrderFlow\Domain\Order\Events\EventPaymentCaptured;
 
 class Order
 {
     private array $items = [];
+    
+    /** @var DomainEvent[] */
+    private array $events = [];
 
     private function __construct(private OrderId $id, private OrderStatus $status, private Currency $currency)
     {
@@ -41,17 +47,23 @@ class Order
             throw new OrderCannotBeSubmitted();
         }
         $this->status = OrderStatus::Submitted;
+        $this->recordEvent(new EventOrderSubmitted(
+            orderId: $this->id,
+            totalAmount: $this->total()->amount(),
+            currency: $this->currency()->value,
+        ));
     }
 
     public function markPaid(): void
     {
-        if (!$this->status->canPay()) {
-            throw new OrderCannotBePaid();
-        }
         if ($this->status === OrderStatus::Paid) {
             return; // idempotent no-op
         }
+        if (!$this->status->canPay()) {
+            throw new OrderCannotBePaid();
+        }
         $this->status = OrderStatus::Paid;
+        $this->recordEvent(new EventPaymentCaptured($this->id));
     }
 
     public function cancel(): void
@@ -60,6 +72,7 @@ class Order
             throw new OrderCannotBeCancelled();
         }
         $this->status = OrderStatus::Cancelled;
+        $this->recordEvent(new EventOrderCancelled($this->id));
     }
 
     public function addItem(string $sku, int $quantity, Money $price): void
@@ -90,5 +103,18 @@ class Order
     public function currency(): Currency
     {
         return $this->currency;
+    }
+
+    /** @return DomainEvent[] */
+    public function releaseEvents(): array
+    {
+        $events = $this->events;
+        $this->events = []; // Очищаем после выдачи
+        return $events;
+    }
+
+    private function recordEvent(DomainEvent $event): void
+    {
+        $this->events[] = $event;
     }
 }

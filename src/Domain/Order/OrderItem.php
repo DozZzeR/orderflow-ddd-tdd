@@ -2,8 +2,6 @@
 
 namespace OrderFlow\Domain\Order;
 
-use OrderFlow\Domain\Order\Exceptions\OrderCannotBeCancelled;
-use OrderFlow\Domain\Order\Exceptions\OrderCannotBeSubmitted;
 use OrderFlow\Domain\Order\Exceptions\OrderItemQuantityMustBePositive;
 
 class OrderItem
