@@ -23,4 +23,9 @@ enum OrderStatus: string // Backed enum with string values
     {
         return $this === self::Submitted;
     }
+
+    public function equals(self $other): bool
+    {
+        return $this === $other;
+    }
 }

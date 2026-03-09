@@ -4,12 +4,11 @@ namespace OrderFlow\Domain\Order;
 
 class OrderId
 {
-    /**
-     * Create a new class instance.
-     */
     public function __construct(public string $value)
     {
-        //
+        if (empty($value)) {
+            throw new \InvalidArgumentException("OrderId cannot be empty");
+        }
     }
 
     public static function fromString(string $value): self
@@ -20,5 +19,10 @@ class OrderId
     public function toString(): string
     {
         return $this->value;
+    }
+
+    public function equals(self $other): bool
+    {
+        return $this->value === $other->value;
     }
 }

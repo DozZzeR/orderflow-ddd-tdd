@@ -14,7 +14,7 @@ use OrderFlow\Domain\Order\Events\EventPaymentCaptured;
 class Order
 {
     private array $items = [];
-    
+
     /** @var DomainEvent[] */
     private array $events = [];
 
@@ -49,8 +49,7 @@ class Order
         $this->status = OrderStatus::Submitted;
         $this->recordEvent(new EventOrderSubmitted(
             orderId: $this->id,
-            totalAmount: $this->total()->amount(),
-            currency: $this->currency()->value,
+            total: $this->total()
         ));
     }
 
