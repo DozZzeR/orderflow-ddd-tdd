@@ -116,4 +116,15 @@ class Order
     {
         $this->events[] = $event;
     }
+
+    public static function reconstitute(
+        OrderId $id,
+        OrderStatus $status,
+        Currency $currency,
+        array $items
+    ): self {
+        $order = new self($id, $status, $currency);
+        $order->items = $items;
+        return $order;
+    }
 }

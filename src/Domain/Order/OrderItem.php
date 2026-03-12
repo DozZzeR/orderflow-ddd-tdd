@@ -33,4 +33,9 @@ class OrderItem
     {
         return Money::of($this->price->amount() * $this->quantity, $this->price->currency());
     }
+
+    public function price(): Money
+    {
+        return $this->price;
+    }
 }

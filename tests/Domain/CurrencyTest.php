@@ -13,6 +13,6 @@ class CurrencyTest extends TestCase
     public function test_it_rejects_unknown_currency_code(): void
     {
         $this->expectException(UnknownCurrency::class);
-        Currency::fromString('USD0000');
+        Currency::from('USD0000');
     }
 }
