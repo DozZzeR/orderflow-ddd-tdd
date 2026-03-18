@@ -53,13 +53,13 @@ class EloquentOrderRepository
             $items[] = OrderItem::from(
                 $itemModel->sku,
                 $itemModel->quantity,
-                Money::of($itemModel->price, Currency::from($model->currency))
+                Money::of($itemModel->price, Currency::fromString($model->currency))
             );
         }
         return Order::reconstitute(
             OrderId::fromString($model->id),
             OrderStatus::from($model->status),
-            Currency::from($model->currency),
+            Currency::fromString($model->currency),
             $items
         );
     }
