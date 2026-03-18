@@ -1,12 +1,12 @@
 <?php
 
-namespace OrderFlow\Application;
+namespace OrderFlow\Application\Order;
 
 use OrderFlow\Application\Events\EventDispatcher;
 use OrderFlow\Domain\Order\OrderId;
 use OrderFlow\Domain\Order\OrderRepository;
 
-final class SubmitOrderAction
+class CapturePaymentAction
 {
     public function __construct(
         private OrderRepository $repository,
@@ -17,10 +17,12 @@ final class SubmitOrderAction
     public function handle(OrderId $orderId): void
     {
         $order = $this->repository->get($orderId);
-        $order->submit();
-        $this->repository->save($order);
-
+        $order->markPaid();
         $events = $order->releaseEvents();
+        if ($events === []) {
+            return;
+        }
+        $this->repository->save($order);
         foreach ($events as $event) {
             $this->dispatcher->dispatch($event);
         }

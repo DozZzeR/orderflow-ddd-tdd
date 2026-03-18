@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Application;
+namespace Tests\Application\Order;
 
-use OrderFlow\Application\CapturePaymentAction;
+use OrderFlow\Application\Order\CapturePaymentAction;
 use OrderFlow\Application\Events\EventDispatcher;
 use OrderFlow\Domain\Order\Currency;
 use OrderFlow\Domain\Order\Events\EventPaymentCaptured;

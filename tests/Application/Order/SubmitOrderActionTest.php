@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Application;
+namespace Tests\Application\Order;
 
 use OrderFlow\Application\Events\EventDispatcher;
-use OrderFlow\Application\SubmitOrderAction;
+use OrderFlow\Application\Order\SubmitOrderAction;
 use OrderFlow\Domain\Order\Currency;
 use OrderFlow\Domain\Order\Events\EventOrderSubmitted;
 use OrderFlow\Domain\Order\Exceptions\OrderCannotBeSubmitted;
