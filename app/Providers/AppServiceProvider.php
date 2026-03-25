@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use OrderFlow\Application\Payment\PaymentSignatureVerifier;
+use OrderFlow\Infrastructure\Adapters\HmacPaymentSignatureVerifier;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -12,6 +14,10 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
+        $this->app->bind(PaymentSignatureVerifier::class, function() {
+            $secret = config('services.payment.secret');
+            return new HmacPaymentSignatureVerifier($secret);
+        });
     }
 
     /**

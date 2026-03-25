@@ -13,7 +13,9 @@ return [
     | a conventional file to locate the various service credentials.
     |
     */
-
+    'payment' => [
+        'secret' => env('PAYMENT_SECRET'),
+    ],
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],
